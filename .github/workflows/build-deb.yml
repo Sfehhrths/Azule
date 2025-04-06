@@ -1,0 +1,36 @@
+name: C/C++ CI
+
+on:
+  push:
+    tags:
+     - 'v*'
+
+    #branches: [ master ]
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Prepare Theos
+        uses: und3fined/theos-action@main
+
+      - name: Build package
+        run: |
+          bash .vscode/build.sh
+      - name: Publish artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fouldecrypt-${{matrix.provider}}
+          path: ${{ github.workspace }}/Azule-iOS.deb
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ${{ github.workspace }}/Azule-iOS.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
