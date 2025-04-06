@@ -1,0 +1,33 @@
+name: C/C++ CI
+
+on:
+  push:
+    tags:
+     - 'v*'
+
+    #branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Build package
+        run: |
+          bash .vscode/build.sh
+      - name: Publish artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Azule
+          path: ${{ github.workspace }}/Azule-iOS.deb
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ${{ github.workspace }}/Azule-iOS.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
