@@ -9,15 +9,12 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-
-      - name: Prepare Theos
-        uses: und3fined/theos-action@main
 
       - name: Build package
         run: |
@@ -25,7 +22,7 @@ jobs:
       - name: Publish artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fouldecrypt-${{matrix.provider}}
+          name: Azule
           path: ${{ github.workspace }}/Azule-iOS.deb
       - name: Release
         uses: softprops/action-gh-release@v1
