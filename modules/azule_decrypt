@@ -118,25 +118,9 @@ while read -r i; do
     CFBundleExecutable="$(ExtractPlistValue CFBundleExecutable "$i")"
     DTPlatformName="$(ExtractPlistValue DTPlatformName "$i")"
     if [ -n "$CFBundleExecutable" ] && [ -e "$(dirname "$i")/$CFBundleExecutable" ] && otool -l "$(dirname "$i")/$CFBundleExecutable" | grep -q 'cryptid 1' && [ "$DTPlatformName" != "watchos" ]; then
-        if [ -z "$dexec" ]; then
-
-            # CHOOSING FOULDECRYPT BINARY
-            ios_version="$(sw_vers -productVersion)"
-            if [[ "${ios_version%.*}" -lt 14 ]] || [[ ! -e "/.installed_taurine" && ! -e "/.installed_unc0ver" ]]; then
-                decrypt="fouldecrypt.tfp0"
-            elif [ -e "/.installed_taurine" ]; then
-                decrypt="fouldecrypt.kernrw"
-            elif [ -e "/.installed_unc0ver" ]; then
-                decrypt="fouldecrypt.krw"
-            fi
-            
-            Announce "Chose $decrypt as decryptor" -v
-            Announce "Decrypting App..."
-        fi
-
         mkdir -p "Payload/$(dirname "$i" | sed "s|^.*$appname|$appname|")"
         Announce "Decrypting $CFBundleExecutable..." -v
-        "$decrypt" -v "$(dirname "$i")/$CFBundleExecutable" "Payload/$(dirname "$i" | sed "s|^.*$appname|$appname|")/$CFBundleExecutable" &>/dev/null
+        fouldecrypt -v "$(dirname "$i")/$CFBundleExecutable" "Payload/$(dirname "$i" | sed "s|^.*$appname|$appname|")/$CFBundleExecutable" &>/dev/null
         status="$?"
         if [ "$status" != "0" ]; then
             qv=$(( qv + 1 ))
